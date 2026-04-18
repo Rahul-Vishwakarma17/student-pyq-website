@@ -1,0 +1,261 @@
+
+
+
+
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { getAllPyqs, uploadPyq, deletePyq } from "../services/pyqService";
+// import { removeToken } from "../services/authService"; // import logout helper
+
+// const Dashboard = ({ token, setToken }) => {
+//   const navigate = useNavigate();
+//   const [pyqs, setPyqs] = useState([]);
+//   const [subject, setSubject] = useState("");
+//   const [semester, setSemester] = useState("");
+//   const [year, setYear] = useState("");
+//   const [pdf, setPdf] = useState(null);
+
+//   useEffect(() => {
+//     if (!token) {
+//       navigate("/login");
+//     } else {
+//       fetchPyqs();
+//     }
+//   }, [token, navigate]);
+
+//   const fetchPyqs = async () => {
+//     try {
+//       const data = await getAllPyqs(token);
+//       setPyqs(data);
+//     } catch {
+//       alert("Failed to fetch PDFs");
+//     }
+//   };
+
+//   const handleUpload = async (e) => {
+//     e.preventDefault();
+//     if (!pdf) return alert("Please select a PDF");
+
+//     const formData = new FormData();
+//     formData.append("subject", subject);
+//     formData.append("semester", semester);
+//     formData.append("year", year);
+//     formData.append("pdf", pdf);
+
+//     try {
+//       await uploadPyq(formData, token);
+//       alert("PDF uploaded successfully!");
+//       setSubject(""); setSemester(""); setYear(""); setPdf(null);
+//       fetchPyqs();
+//     } catch {
+//       alert("Upload failed!");
+//     }
+//   };
+
+//   const handleDelete = async (id) => {
+//     if (!window.confirm("Are you sure to delete this PDF?")) return;
+//     try {
+//       await deletePyq(id, token);
+//       alert("PDF deleted successfully!");
+//       fetchPyqs();
+//     } catch {
+//       alert("Delete failed!");
+//     }
+//   };
+
+//   // ---- Logout function ----
+//   const handleLogout = () => {
+//     removeToken();      // remove token from localStorage
+//     setToken("");       // clear token state in App.jsx
+//     navigate("/");      // redirect to Home page
+//   };
+
+//   return (
+//     <div>
+//       <h1>Admin Dashboard</h1>
+//       <button onClick={handleLogout} style={{ float: "right" }}>Logout</button>
+
+//       {/* Upload Form */}
+//       <form onSubmit={handleUpload}>
+//         <input type="text" placeholder="Subject" value={subject} onChange={e => setSubject(e.target.value)} required />
+//         <input type="number" placeholder="Semester" value={semester} onChange={e => setSemester(e.target.value)} required />
+//         <input type="number" placeholder="Year" value={year} onChange={e => setYear(e.target.value)} required />
+//         <input type="file" accept="application/pdf" onChange={e => setPdf(e.target.files[0])} required />
+//         <button type="submit">Upload PDF</button>
+//       </form>
+
+//       {/* List of PDFs */}
+//       <h2>All PYQs</h2>
+//       <ul>
+//         {pyqs.map((pyq) => (
+//           <li key={pyq._id}>
+//             {pyq.subject} - Semester {pyq.semester} ({pyq.year}){" "}
+//             <a href={`http://localhost:5000${pyq.pdfUrl}`} target="_blank" rel="noopener noreferrer">Download</a>{" "}
+//             <button onClick={() => handleDelete(pyq._id)}>Delete</button>
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// };
+
+// export default Dashboard;
+
+
+// import React, { useEffect, useState } from "react";
+// import { getAllPyqs, uploadPyq, deletePyq } from "../services/pyqService";
+
+// const Dashboard = ({ token }) => {
+//   const [pyqs, setPyqs] = useState([]);
+//   const [subject, setSubject] = useState("");
+//   const [semester, setSemester] = useState("");
+//   const [year, setYear] = useState("");
+//   const [pdf, setPdf] = useState(null);
+
+//   const fetchPyqs = async () => {
+//     try {
+//       const data = await getAllPyqs(token);
+//       setPyqs(data);
+//     } catch {
+//       alert("Failed to fetch PDFs");
+//     }
+//   };
+
+//   useEffect(() => { fetchPyqs(); }, [token]);
+
+//   const handleUpload = async (e) => {
+//     e.preventDefault();
+//     if (!pdf) return alert("Select a PDF");
+
+//     const formData = new FormData();
+//     formData.append("subject", subject);
+//     formData.append("semester", semester);
+//     formData.append("year", year);
+//     formData.append("pdf", pdf);
+
+//     try {
+//       await uploadPyq(formData, token);
+//       alert("PDF uploaded!");
+//       setSubject(""); setSemester(""); setYear(""); setPdf(null);
+//       fetchPyqs();
+//     } catch { alert("Upload failed!"); }
+//   };
+
+//   const handleDelete = async (id) => {
+//     if (!window.confirm("Are you sure to delete?")) return;
+//     try { await deletePyq(id, token); fetchPyqs(); } catch { alert("Delete failed!"); }
+//   };
+
+//   return (
+//     <div style={styles.container}>
+//       <h1>Admin Dashboard</h1>
+
+//       <form style={styles.form} onSubmit={handleUpload}>
+//         <input placeholder="Subject" value={subject} onChange={(e)=>setSubject(e.target.value)} required />
+//         <input type="number" placeholder="Semester" value={semester} onChange={(e)=>setSemester(e.target.value)} required />
+//         <input type="number" placeholder="Year" value={year} onChange={(e)=>setYear(e.target.value)} required />
+//         <input type="file" accept="application/pdf" onChange={(e)=>setPdf(e.target.files[0])} required />
+//         <button type="submit">Upload PDF</button>
+//       </form>
+
+//       <h2>All PYQs</h2>
+//       <div style={styles.grid}>
+//         {pyqs.map((pyq) => (
+//           <div key={pyq._id} style={styles.card}>
+//             <h3>{pyq.subject}</h3>
+//             <p>Semester: {pyq.semester}</p>
+//             <p>Year: {pyq.year}</p>
+//             <a href={`http://localhost:5000${pyq.pdfUrl}`} target="_blank" rel="noopener noreferrer" style={styles.downloadBtn}>Download</a>
+//             <button onClick={()=>handleDelete(pyq._id)} style={styles.deleteBtn}>Delete</button>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// const styles = {
+//   container: { padding: "20px" },
+//   form: { display: "flex", flexDirection: "column", gap: "10px", maxWidth: "300px" },
+//   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "15px", marginTop: "20px" },
+//   card: { padding: "15px", border: "1px solid #ddd", borderRadius: "8px", textAlign: "center", backgroundColor: "#f9f9f9" },
+//   downloadBtn: { display:"inline-block", margin:"5px", padding:"6px 12px", backgroundColor:"#0077cc", color:"#fff", textDecoration:"none", borderRadius:"4px" },
+//   deleteBtn: { display:"inline-block", margin:"5px", padding:"6px 12px", backgroundColor:"#ff4d4f", color:"#fff", border:"none", borderRadius:"4px", cursor:"pointer" },
+// };
+
+// export default Dashboard;
+
+
+import React, { useEffect, useState } from "react";
+import { getAllPyqs, uploadPyq, deletePyq } from "../services/pyqService";
+
+const Dashboard = ({ token }) => {
+  const [pyqs, setPyqs] = useState([]);
+  const [subject, setSubject] = useState("");
+  const [semester, setSemester] = useState("");
+  const [year, setYear] = useState("");
+  const [pdf, setPdf] = useState(null);
+
+  const fetchPyqs = async () => {
+    try {
+      const data = await getAllPyqs(token);
+      setPyqs(data);
+    } catch {
+      alert("Failed to fetch PDFs");
+    }
+  };
+
+  useEffect(() => { fetchPyqs(); }, [token]);
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!pdf) return alert("Select a PDF");
+
+    const formData = new FormData();
+    formData.append("subject", subject);
+    formData.append("semester", semester);
+    formData.append("year", year);
+    formData.append("pdf", pdf);
+
+    try {
+      await uploadPyq(formData, token);
+      alert("PDF uploaded!");
+      setSubject(""); setSemester(""); setYear(""); setPdf(null);
+      fetchPyqs();
+    } catch { alert("Upload failed!"); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure to delete?")) return;
+    try { await deletePyq(id, token); fetchPyqs(); } catch { alert("Delete failed!"); }
+  };
+
+  return (
+    <div className="container">
+      <h1 className="title">Admin Dashboard</h1>
+
+      <form className="form" onSubmit={handleUpload}>
+        <input placeholder="Subject" value={subject} onChange={(e)=>setSubject(e.target.value)} required />
+        <input type="number" placeholder="Semester" value={semester} onChange={(e)=>setSemester(e.target.value)} required />
+        <input type="number" placeholder="Year" value={year} onChange={(e)=>setYear(e.target.value)} required />
+        <input type="file" accept="application/pdf" onChange={(e)=>setPdf(e.target.files[0])} required />
+        <button type="submit">Upload PDF</button>
+      </form>
+
+      <h2>All PYQs</h2>
+      <div className="grid">
+        {pyqs.map((pyq) => (
+          <div key={pyq._id} className="card">
+            <h3>{pyq.subject}</h3>
+            <p>Semester: {pyq.semester}</p>
+            <p>Year: {pyq.year}</p>
+            <a href={`http://localhost:5000${pyq.pdfUrl}`} target="_blank" rel="noopener noreferrer" className="btn">Download</a>
+            <button onClick={()=>handleDelete(pyq._id)} className="deleteBtn">Delete</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
